@@ -14,6 +14,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import logger from './src/logger.js';
+import readline from 'readline';
 
 // Global deactivation of LangChain logs
 process.env.LANGCHAIN_TRACING = 'false';
@@ -221,6 +222,20 @@ const formatAgentResponse = (response: string): string => {
     .join('\n');
 };
 
+const getUserInput = (): Promise<string> => {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  return new Promise((resolve) => {
+    rl.question(chalk.green('User: '), (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
+};
+
 /**
  * Main function to run the application
  */
@@ -293,15 +308,14 @@ const localRun = async (): Promise<void> => {
       agentconfig: agentConfig,
     });
 
-    await agent.createAgentReactExecutor();
+    // Skip database initialization
+    agent.setLoggingOptions({
+      langchainVerbose: !silentLlm,
+      tokenLogging: !silentLlm,
+      disabled: true
+    });
 
-    // Configure logging options with a small delay to ensure initialization
-    setTimeout(() => {
-      agent.setLoggingOptions({
-        langchainVerbose: !silentLlm,
-        tokenLogging: !silentLlm,
-      });
-    }, 100);
+    await agent.createAgentReactExecutor();
 
     if (mode === 'agent') {
       console.log(chalk.dim('\nStarting interactive session...\n'));
@@ -312,18 +326,8 @@ const localRun = async (): Promise<void> => {
       );
 
       while (true) {
-        const { user } = await inquirer.prompt([
-          {
-            type: 'input',
-            name: 'user',
-            message: chalk.green('User'),
-            validate: (value: string) => {
-              const trimmed = value.trim();
-              if (!trimmed) return 'Please enter a valid message';
-              return true;
-            },
-          },
-        ]);
+        const user = await getUserInput();
+        if (!user) continue;
 
         // Start with a message instead of a spinner to allow log display
         console.log(chalk.yellow('Processing request...'));

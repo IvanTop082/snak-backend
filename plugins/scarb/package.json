@@ -7,8 +7,8 @@
   "scripts": {
     "test": "jest",
     "build": "pnpm clean:dist && tsc",
-    "clean": "rm -rf node_modules",
-    "clean:dist": "rm -rf dist",
+    "clean": "rimraf node_modules",
+    "clean:dist": "rimraf dist",
     "clean:all": "pnpm clean && pnpm clean:dist",
     "lint": "eslint \"src/**/*.ts\" --fix"
   },
@@ -17,6 +17,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/jsdom": "^21.1.7",
     "@types/tmp": "^0.2.6",
+    "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   },

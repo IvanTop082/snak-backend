@@ -7,8 +7,8 @@
   "scripts": {
     "test": "jest",
     "build": "pnpm clean:dist && tsc",
-    "clean": "rm -rf node_modules",
-    "clean:dist": "rm -rf dist",
+    "clean": "rimraf node_modules",
+    "clean:dist": "rimraf dist",
     "clean:all": "pnpm clean && pnpm clean:dist",
     "lint": "eslint \"src/**/*.ts\" --fix"
   },
@@ -19,6 +19,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/axios": "^0.14.4"
+    "@types/axios": "^0.14.4",
+    "rimraf": "^5.0.5"
   }
 }
